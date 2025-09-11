@@ -9,6 +9,7 @@ from typing import Callable
 
 import flet as ft
 
+from ..models import TaskModel
 from .buttons import delete_icon_button, edit_icon_button, save_icon_button
 
 
@@ -17,17 +18,19 @@ class Task(ft.Column):
 
     def __init__(
         self,
-        task_name: str,
+        task_model: TaskModel,
         task_status_change: Callable[["Task"], None],
         task_delete: Callable[["Task"], None],
     ) -> None:
         super().__init__()
-        self.completed: bool = False
-        self.task_name: str = task_name
+        self.task_model = task_model
+        self.completed: bool = task_model.completed
         self.task_status_change = task_status_change
         self.task_delete = task_delete
         self.display_task = ft.Checkbox(
-            value=False, label=self.task_name, on_change=self.status_changed
+            value=task_model.completed,
+            label=self.task_model.name,
+            on_change=self.status_changed,
         )
         self.edit_name = ft.TextField(expand=1)
 
@@ -60,6 +63,7 @@ class Task(ft.Column):
     def edit_clicked(self, e: ft.ControlEvent | None) -> None:
         """Switch to edit mode."""
         self.edit_name.value = self.display_task.label
+
         self.display_view.visible = False
         self.edit_view.visible = True
         self.update()
@@ -67,6 +71,7 @@ class Task(ft.Column):
     def save_clicked(self, e: ft.ControlEvent | None) -> None:
         """Save changes and switch back to display mode."""
         self.display_task.label = self.edit_name.value
+        self.task_model.name = self.edit_name.value
         self.display_view.visible = True
         self.edit_view.visible = False
         self.update()
@@ -74,6 +79,7 @@ class Task(ft.Column):
     def status_changed(self, e: ft.ControlEvent | None) -> None:
         """Handle checkbox state change."""
         self.completed = self.display_task.value
+        self.task_model.completed = self.completed
         self.task_status_change(self)
 
     def delete_clicked(self, e: ft.ControlEvent | None) -> None:
