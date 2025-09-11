@@ -58,20 +58,24 @@ class Task(ft.Column):
         self.controls = [self.display_view, self.edit_view]
 
     def edit_clicked(self, e: ft.ControlEvent | None) -> None:
+        """Switch to edit mode."""
         self.edit_name.value = self.display_task.label
         self.display_view.visible = False
         self.edit_view.visible = True
         self.update()
 
     def save_clicked(self, e: ft.ControlEvent | None) -> None:
+        """Save changes and switch back to display mode."""
         self.display_task.label = self.edit_name.value
         self.display_view.visible = True
         self.edit_view.visible = False
         self.update()
 
     def status_changed(self, e: ft.ControlEvent | None) -> None:
+        """Handle checkbox state change."""
         self.completed = self.display_task.value
         self.task_status_change(self)
 
     def delete_clicked(self, e: ft.ControlEvent | None) -> None:
+        """Handle task deletion."""
         self.task_delete(self)

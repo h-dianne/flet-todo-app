@@ -35,6 +35,7 @@ class TodoApp(ft.Column):
         ]
 
     def add_clicked(self, e: ft.ControlEvent | None) -> None:
+        """Add a new task from the input field."""
         value = self.add_bar.input.value
         if value:
             task = Task(value, self.task_status_change, self.task_delete)
@@ -44,24 +45,29 @@ class TodoApp(ft.Column):
             self.update()
 
     def task_status_change(self, task: Task) -> None:
+        """Handle task status change."""
         self.update()
 
     def task_delete(self, task: Task) -> None:
+        """Handle task deletion."""
         self.tasks.controls.remove(task)
         self.update()
 
     def tabs_changed(self, e: ft.ControlEvent | None) -> None:
+        """Handle filter tab change."""
         self.update()
 
     def clear_clicked(self, e: ft.ControlEvent | None) -> None:
+        """Clear all completed tasks."""
         for task in list(self.tasks.controls):
             if task.completed:
                 self.task_delete(task)
 
     def before_update(self) -> None:
+        """Update task visibility based on selected filter before rendering."""
         status: str = self.filter.tabs[self.filter.selected_index].text
         count: int = 0
-        for task in self.tasks.controls:  # type: ignore[assignment]
+        for task in self.tasks.controls:
             task.visible = (
                 status == "all"
                 or (status == "active" and not task.completed)
