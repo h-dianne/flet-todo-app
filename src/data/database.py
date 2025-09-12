@@ -1,13 +1,27 @@
 import sqlite3
+import sys
 from pathlib import Path
 
 
 class Database:
     """SQlite database handler for the todo app"""
 
-    def __init__(self, db_path: str = "data/todos.db"):
-        self.db_path = Path(db_path)
-        self.db_path.parent.mkdir(exist_ok=True)
+    def __init__(self, db_path: str = None):
+        if db_path is None:
+            # Determine appropriate data directory based on execution context
+            if getattr(sys, "frozen", False):
+                # Running as executable - use AppData
+                app_data = Path.home() / "AppData" / "Local" / "FletTodoApp"
+            else:
+                # Running in development - use project directory
+                app_data = Path(__file__).parent.parent.parent / "storage"
+
+            app_data.mkdir(parents=True, exist_ok=True)
+            self.db_path = app_data / "todos.db"
+        else:
+            self.db_path = Path(db_path)
+            self.db_path.parent.mkdir(exist_ok=True)
+
         self._init_database()
 
     def _init_database(self) -> None:
