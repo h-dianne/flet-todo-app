@@ -18,10 +18,26 @@ class Database:
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT NOT NULL,
                         completed BOOLEAN DEFAULT FALSE,
+                        priority_level TEXT DEFAULT 'low',
+                        deadline TIMESTAMP,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+
+            # Add new columns to existing table if they don't exist
+            try:
+                conn.execute(
+                    "ALTER TABLE tasks ADD COLUMN priority_level TEXT DEFAULT 'low'"
+                )
+            except Exception:
+                pass  # Column already exists
+
+            try:
+                conn.execute("ALTER TABLE tasks ADD COLUMN deadline TIMESTAMP")
+            except Exception:
+                pass  # Column already exists
+
             conn.commit()
 
     def connection(self) -> sqlite3.Connection:
