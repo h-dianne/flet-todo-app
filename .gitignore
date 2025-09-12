@@ -11,3 +11,6 @@ wheels/
 
 # Database files
 data/
+
+# Build Files
+*.spec
