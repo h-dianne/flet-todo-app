@@ -54,31 +54,38 @@ class TodoApp(ft.Column):
                 task_model=model,
                 task_status_change=self.task_status_change,
                 task_delete=self.task_delete,
+                task_edit=self.task_edit,
             )
             for model in task_models
         }
 
     def add_clicked(self, e: ft.ControlEvent | None) -> None:
         """Handle adding a new task"""
-        task_name = self.new_task.input.value.strip()
+        task_data = self.new_task.get_task_data()
+        task_name = task_data["name"].strip()
         if not task_name:
             return
 
         # Create task in database
-        task_model = self.task_repo.create_task(task_name)
+        task_model = self.task_repo.create_task(
+            name=task_name,
+            priority_level=task_data["priority_level"],
+            deadline=task_data["deadline"],
+        )
 
         # Create UI Component
         task_component = Task(
             task_model=task_model,
             task_status_change=self.task_status_change,
             task_delete=self.task_delete,
+            task_edit=self.task_edit,
         )
 
         # Add to tasks dict
         self.tasks[task_model.id] = task_component
 
         # Clear input and update view
-        self.new_task.input.value = ""
+        self.new_task.clear_inputs()
         self._update_tasks_view()
         self.new_task.input.focus()
         self.update()
@@ -87,6 +94,18 @@ class TodoApp(ft.Column):
         """Handle task status change."""
         # Update in database
         self.task_repo.update_task(task.task_model.id, completed=task.completed)
+        self._update_tasks_view()
+        self.update()
+
+    def task_edit(self, task: Task) -> None:
+        """Handle task edit."""
+        # Update in database
+        self.task_repo.update_task(
+            task.task_model.id,
+            name=task.task_model.name,
+            priority_level=task.task_model.priority_level,
+            deadline=task.task_model.deadline,
+        )
         self._update_tasks_view()
         self.update()
 
