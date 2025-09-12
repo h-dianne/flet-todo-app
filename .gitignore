@@ -10,7 +10,7 @@ wheels/
 .venv
 
 # Database files
-data/
+storage/
 
 # Build Files
 *.spec
