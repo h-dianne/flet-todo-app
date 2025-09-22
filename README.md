@@ -122,9 +122,8 @@ flet-todo-app/
 
 ### Architecture
 
-- **Component-Based Design** - Modular UI components for maintainability
 - **Repository Pattern** - Clean separation between data access and business logic
-- **MVC Pattern** - Model-View-Controller architecture for organized code
+- **Component-Based Architecture** - Modular design with separated data and UI layers
 
 ### Database Schema
 
