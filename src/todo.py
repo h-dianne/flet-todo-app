@@ -26,7 +26,8 @@ class TodoApp(ft.Column):
         self.new_task = AddTaskRow(on_submit=self.add_clicked)
         self.tasks_views = ft.Column()
         self.filter_tabs = FilterTabs(on_change=self.tabs_changed)
-        self.items_left = ft.Text("0 items left")
+        self.footer = FooterBar(on_clear=self.clear_completed_tasks)
+        self.items_left = self.footer.items_left
 
         # Update tasks view
         self._update_tasks_view()
@@ -41,7 +42,7 @@ class TodoApp(ft.Column):
                 controls=[
                     self.filter_tabs,
                     self.tasks_views,
-                    FooterBar(self.items_left),
+                    self.footer,
                 ],
             ),
         ]
@@ -120,36 +121,51 @@ class TodoApp(ft.Column):
         self._update_tasks_view()
         self.update()
 
+    def clear_completed_tasks(self, e: ft.ControlEvent | None) -> None:
+        """Remove all completed tasks from the list and storage."""
+        completed_task_ids = [
+            task_id for task_id, task in self.tasks.items() if task.completed
+        ]
+        if not completed_task_ids:
+            return
+
+        for task_id in completed_task_ids:
+            self.task_repo.delete_task(task_id)
+            del self.tasks[task_id]
+
+        self._update_tasks_view()
+        self.update()
+
     def tabs_changed(self, e: ft.ControlEvent) -> None:
         """Handle filter tab change."""
         self._update_tasks_view()
+        self.update()
 
     def _update_tasks_view(self) -> None:
         """Update the tasks view based on current filter."""
-        # Get current filter
-        status = (
-            self.filter_tabs.selected_tab
-            if hasattr(self.filter_tabs, "selected_tab")
-            else "all"
-        )
+        selected_index = getattr(self.filter_tabs, "selected_index", 0)
+        if selected_index is None:
+            selected_index = 0
 
-        # Filter tasks
-        if status == "all":
-            filtered_tasks = list(self.tasks.values())
-        elif status == "active":
-            filtered_tasks = [
-                task for task in self.tasks.values() if not task.completed
-            ]
+        try:
+            status = self.filter_tabs.tabs[selected_index].text.lower()
+        except (IndexError, TypeError, AttributeError):
+            status = "all"
+
+        all_tasks = list(self.tasks.values())
+        if status == "active":
+            filtered_tasks = [task for task in all_tasks if not task.completed]
         elif status == "completed":
-            filtered_tasks = [task for task in self.tasks.values() if task.completed]
+            filtered_tasks = [task for task in all_tasks if task.completed]
         else:
-            filtered_tasks = list(self.tasks.values())
+            filtered_tasks = all_tasks
 
         # Update tasks view
         self.tasks_views.controls = filtered_tasks
 
-        # Update items left counter
-        active_count = len([task for task in self.tasks.values() if not task.completed])
-        self.items_left.value = (
-            f"{active_count} item{'s' if active_count != 1 else ''} left"
-        )
+        # Update footer state
+        active_count = sum(1 for task in self.tasks.values() if not task.completed)
+        self.footer.set_count(active_count)
+
+        completed_count = sum(1 for task in self.tasks.values() if task.completed)
+        self.footer.set_clear_visible(status == "completed" and completed_count > 0)
