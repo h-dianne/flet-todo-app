@@ -146,7 +146,7 @@ CREATE TABLE tasks (
 For the best development experience, use the web version with hot reload:
 
 ```bash
-uv run flet run --web --port 8080 src/main.py
+uv run flet run --web -m src.main
 ```
 
 This will:
@@ -167,6 +167,19 @@ uv add pyinstaller
 uv run pyinstaller --onefile --name "TodoApp" src/main.py
 ```
 
+#### Building Options
+
+```bash
+# Basic executable
+uv run pyinstaller --onefile src/main.py
+
+# With custom name and icon
+uv run pyinstaller --onefile --name "TodoApp" --icon="icon.ico" src/main.py
+
+# Console-free (no command prompt window)
+uv run pyinstaller --onefile --windowed --name "TodoApp" src/main.py
+```
+
 The executable will be created in the `dist/` directory.
 
 #### Data Storage in Executable
@@ -182,19 +195,6 @@ This ensures:
 - ✅ Each user has their own tasks
 - ✅ No admin permissions required
 - ✅ Data survives app reinstallation
-
-#### Building Options
-
-```bash
-# Basic executable
-uv run pyinstaller --onefile src/main.py
-
-# With custom name and icon
-uv run pyinstaller --onefile --name "TodoApp" --icon="icon.ico" src/main.py
-
-# Console-free (no command prompt window)
-uv run pyinstaller --onefile --windowed --name "TodoApp" src/main.py
-```
 
 ## 📊 Data Management
 
