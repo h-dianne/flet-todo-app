@@ -48,9 +48,6 @@ A modern, feature-rich todo application built with Python and [Flet](https://fle
    ```bash
    # Desktop application
    uv run python src/main.py
-
-   # Web application with hot reload
-   uv run flet run --web --port 8080 src/main.py
    ```
 
 ## 📱 How to Use
@@ -139,23 +136,7 @@ CREATE TABLE tasks (
 );
 ```
 
-## 🛠️ Development
-
-### Development Mode with Hot Reload
-
-For the best development experience, use the web version with hot reload:
-
-```bash
-uv run flet run --web -m src.main
-```
-
-This will:
-
-- Start the app in your web browser
-- Automatically reload when you save changes
-- Preserve app state during most code changes
-
-### Building for Distribution
+## Building for Distribution
 
 Create a standalone executable for easy distribution:
 
